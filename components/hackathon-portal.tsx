@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '@/lib/supabase-browser'
 import {
   ArrowRight,
@@ -103,7 +103,33 @@ function RegistrationModal({ onClose }: { onClose: () => void }) {
 
 export default function HackathonPortal() {
   const [registering, setRegistering] = useState(false)
-  return <div className="min-h-screen bg-white text-slate-950"><Header onRegister={() => setRegistering(true)} /><main><Hero onRegister={() => setRegistering(true)} /><Discover onRegister={() => setRegistering(true)} /><HowItWorks /><StatusLookup /></main><footer className="border-t border-slate-200 bg-white"><div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-8 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between lg:px-8"><Brand /><p>Built for the people who keep building.</p><a href="/admin-portal-xyz" className="text-xs text-slate-400 hover:text-slate-700">Admin portal</a></div></footer>{registering && <RegistrationModal onClose={() => setRegistering(false)} />}</div>
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+
+  useEffect(() => {
+    let mounted = true
+    supabase.auth.getSession().then(({ data }) => {
+      if (mounted) setIsAuthenticated(Boolean(data.session))
+    })
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(Boolean(session))
+    })
+
+    return () => {
+      mounted = false
+      authListener.subscription.unsubscribe()
+    }
+  }, [])
+
+  const handleRegister = () => {
+    if (!isAuthenticated) {
+      window.location.href = '/auth'
+      return
+    }
+    setRegistering(true)
+  }
+
+  return <div className="min-h-screen bg-white text-slate-950"><Header onRegister={handleRegister} /><main><Hero onRegister={handleRegister} /><Discover onRegister={handleRegister} /><HowItWorks /><StatusLookup /></main><footer className="border-t border-slate-200 bg-white"><div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-8 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between lg:px-8"><Brand /><p>Built for the people who keep building.</p><a href="/admin-portal-xyz" className="text-xs text-slate-400 hover:text-slate-700">Admin portal</a></div></footer>{registering && isAuthenticated && <RegistrationModal onClose={() => setRegistering(false)} />}</div>
 }
 
 export function AdminPortal() {
