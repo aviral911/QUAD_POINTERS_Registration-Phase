@@ -94,7 +94,7 @@ function RegistrationModal({ onClose }: { onClose: () => void }) {
       setError(registrationError.code === '23505' ? 'This email is already registered for the hackathon.' : 'We could not save your application. Please try again.')
       return
     }
-submitApplication()
+    setSubmitted(true)
   }
   if (submitted) return <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 grid place-items-center bg-slate-950/50 p-5 backdrop-blur-sm"><div className="w-full max-w-md rounded-3xl bg-white p-8 text-center shadow-2xl"><div className="mx-auto grid size-16 place-items-center rounded-full bg-emerald-100 text-emerald-600"><Check className="size-8" /></div><h2 className="mt-5 text-2xl font-semibold text-slate-950">You&apos;re on the list.</h2><p className="mt-2 text-sm leading-6 text-slate-500">We&apos;ll send next steps to {data.email || 'your inbox'} shortly. Good luck building something brilliant.</p><button onClick={onClose} className="mt-7 w-full rounded-xl bg-slate-950 py-3 text-sm font-semibold text-white">Done</button></div></div>
   const labels = ['About you', 'Your work', 'Motivation', 'Review']

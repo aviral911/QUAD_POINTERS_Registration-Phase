@@ -46,6 +46,11 @@ create index if not exists registrations_hackathon_id_idx on public.registration
 create index if not exists registrations_status_idx on public.registrations(status);
 create index if not exists hackathons_status_idx on public.hackathons(status);
 
+-- Seed the public event used by the applicant flow when the schema is first installed.
+insert into public.hackathons (title, subtitle, description, starts_at, ends_at, location, tags, status)
+select 'Neon Future', 'Build what comes next', 'A three-day challenge for ambitious builders.', '2026-10-18 09:00:00+00', '2026-10-20 18:00:00+00', 'Virtual + New York', array['AI', 'Climate', 'Open source'], 'open'
+where not exists (select 1 from public.hackathons where title = 'Neon Future');
+
 alter table public.hackathons enable row level security;
 alter table public.registrations enable row level security;
 alter table public.admin_users enable row level security;
